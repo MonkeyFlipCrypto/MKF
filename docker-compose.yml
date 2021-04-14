@@ -24,6 +24,8 @@ services:
       DB_PASSWORD: "${DB_PASSWORD:-monkeyflip}"
     volumes:
       - ".:/usr/src"
+    ports:
+      - "3000:3000"
     restart: on-failure
     env_file:
       - ./.env
