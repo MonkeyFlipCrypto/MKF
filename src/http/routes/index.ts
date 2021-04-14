@@ -15,7 +15,7 @@ const schema_auth = {
 	type: 'object',
 	properties: {
 		id: schema_id,
-		key: { type: 'string', required: true, maxLength: 25, minLength: 25 }
+		key: { type: 'string', required: true }
 	}
 }
 
