@@ -1,12 +1,14 @@
 import Block from './database/models/block'
 import Chain from './database/models/chain'
+import User from './database/models/user'
 import { defaultConfig, BlockchainConfig } from './config'
 
 import { Sequelize } from 'sequelize'
 
 const models = {
 	Block,
-	Chain
+	Chain,
+	User
 }
 
 export default class Blockchain {

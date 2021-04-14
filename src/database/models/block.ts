@@ -8,7 +8,7 @@ export default class Block extends Model {
 	public nonce!: number
 	public preceedingHash!: string
 	public hash!: string
-	public ownerID!: string
+	public owner!: number
 
 	computeHash() {
 		return SHA256(this.index + this.preceedingHash + this.timestamp + JSON.stringify(this.data) + this.nonce).toString()
@@ -52,8 +52,8 @@ export default class Block extends Model {
 				allowNull: false,
 				defaultValue: ''
 			},
-			ownerID: {
-				type: DataTypes.UUID,
+			owner: {
+				type: DataTypes.BIGINT,
 				allowNull: true
 			}
 		}, {
