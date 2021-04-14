@@ -1,0 +1,37 @@
+version: '3'
+services:
+  db:
+    image: "yobasystems/alpine-mariadb:10.4.13"
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "db:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-possum}"
+      MYSQL_DATABASE: possumcoin
+      MYSQL_USER: possum
+      MYSQL_PASSWORD: "${DB_PASSWORD:-possum}"
+      MYSQL_ROOT_HOST: "%"
+    networks:
+      - servers
+    restart: on-failure
+  server:
+    image: "node:14-alpine"
+    command: scripts/entrypoint.sh
+    working_dir: "/usr/src"
+    depends_on:
+      - db
+    networks:
+      - servers
+    environment:
+      DB_PASSWORD: "${DB_PASSWORD:-possum}"
+    volumes:
+      - ".:/usr/src"
+    restart: on-failure
+    env_file:
+      - ./.env
+
+networks:
+  servers:
+
+volumes:
+  db:
