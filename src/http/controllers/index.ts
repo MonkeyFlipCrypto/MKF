@@ -6,6 +6,7 @@ import { HttpBadRequestError } from '../exceptions'
 import { BaseMessage } from '../../message'
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
+import crypto from 'crypto'
 
 const genGetWorth = (bc: Blockchain) => async (id: number) => {
 	return await Block.count({
@@ -20,10 +21,10 @@ export default function(bc: Blockchain) {
 
 	return {
 		async register(req: Request, res: Response, next: NextFunction) {
-			const user = await User.create({})
-			const key = user.createKey()
-
-			await user.save()
+			const key = crypto.randomBytes(25).toString('hex')
+			const user = await User.create({
+				key
+			})
 
 			res.json(new BaseMessage({
 				key,
@@ -39,7 +40,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!bcrypt.compareSync(user.key, req.body.key)) {
+			if (!bcrypt.compareSync(req.body.key, user.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
@@ -69,7 +70,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!user.auth(req.body.key)) {
+			if (!bcrypt.compareSync(req.body.key, user.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
@@ -105,7 +106,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!bcrypt.compareSync(user.key, req.body.key)) {
+			if (!bcrypt.compareSync(req.body.key, user.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
@@ -150,7 +151,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!bcrypt.compareSync(user.key, req.body.key)) {
+			if (!bcrypt.compareSync(req.body.key, user.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
@@ -181,10 +182,21 @@ export default function(bc: Blockchain) {
 			const totalBlocks = await Block.count()
 			const ownedBlocks = totalBlocks - freeBlocks
 
+			const firstBlock = await Block.findOne({
+				limit: 1,
+				where: {},
+				order: [['createdAt', 'ASC']]
+			})
+
 			res.json(new BaseMessage({
 				freeBlocks,
 				totalBlocks,
 				ownedBlocks,
+				firstBlock: {
+					index: firstBlock[0].index,
+					hash: firstBlock[0].hash,
+					timestamp: firstBlock[0].timestamp
+				}
 			}, 'general:info'))
 		}
 	}
