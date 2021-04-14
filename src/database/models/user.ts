@@ -31,6 +31,7 @@ export default class User extends Model {
 			key: {
 				type: DataTypes.STRING,
 				allowNull: false,
+				defaultValue: '',
 				set(value) {
 					const salt = bcrypt.genSaltSync(SALT_ROUNDS)
 					const hash = bcrypt.hashSync(value, salt)
