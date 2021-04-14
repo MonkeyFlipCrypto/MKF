@@ -181,17 +181,10 @@ export default function(bc: Blockchain) {
 			const totalBlocks = await Block.count()
 			const ownedBlocks = totalBlocks - freeBlocks
 
-			const firstHash = await Block.findAll({
-				limit: 1,
-				where: {},
-				order: [['createdAt', 'ASC']]
-			})[0].hash
-
 			res.json(new BaseMessage({
 				freeBlocks,
 				totalBlocks,
 				ownedBlocks,
-				firstHash
 			}, 'general:info'))
 		}
 	}
