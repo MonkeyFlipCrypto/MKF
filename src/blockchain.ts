@@ -49,11 +49,11 @@ export default class Blockchain {
 	}
 
 	async obtainLatestBlock(): Promise<Block> {
-		return await Block.findAll({
+		return (await Block.findAll({
 			limit: 1,
 			where: {},
 			order: [['createdAt', 'DESC']]
-		})[0]
+		}))[0]
 	}
 
 	async addBlock(): Promise<Block> {
