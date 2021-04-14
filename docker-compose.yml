@@ -14,14 +14,12 @@ services:
     networks:
       - servers
     restart: on-failure
-  server:
+  server_crypto:
     image: "node:14-alpine"
     command: scripts/entrypoint.sh
     working_dir: "/usr/src"
     depends_on:
       - db
-    networks:
-      - servers
     environment:
       DB_PASSWORD: "${DB_PASSWORD:-monkeyflip}"
     volumes:
