@@ -69,7 +69,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!bcrypt.compareSync(user.key, req.body.key)) {
+			if (!user.auth(req.body.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
@@ -179,13 +179,19 @@ export default function(bc: Blockchain) {
 			})
 
 			const totalBlocks = await Block.count()
-
 			const ownedBlocks = totalBlocks - freeBlocks
+
+			const firstHash = await Block.findAll({
+				limit: 1,
+				where: {},
+				order: [['createdAt'. 'ASC']]
+			})[0].hash
 
 			res.json(new BaseMessage({
 				freeBlocks,
 				totalBlocks,
-				ownedBlocks
+				ownedBlocks,
+				firstHash
 			}, 'general:info'))
 		}
 	}

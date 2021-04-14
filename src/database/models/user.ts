@@ -15,6 +15,12 @@ export default class User extends Model {
 		return key
 	}
 
+	auth(value: string): boolean {
+		const salt = bcrypt.genSaltSync(SALT_ROUNDS)
+		const hash = bcrypt.hashSync(value, salt)
+		return this.key === hash
+	}
+
 	static initializeModel(sequelize: Sequelize): Model {
 		return User.init({
 			id: {
