@@ -69,7 +69,7 @@ export default function(bc: Blockchain) {
 				throw new HttpBadRequestError('User does not exist')
 			}
 
-			if (!bcrypt.compareSync(user.key, req.query.key)) {
+			if (!bcrypt.compareSync(user.key, req.body.key)) {
 				throw new HttpBadRequestError('Invalid key, cannot authenticate')
 			}
 
