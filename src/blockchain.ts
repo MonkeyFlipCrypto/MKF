@@ -55,6 +55,7 @@ export default class Blockchain {
 			preceedingHash: latestBlock.hash
 		})
 
+		block.hash = block.computeHash()
 		block.proofOfWork(this.chain.diff)
 		this.chain.diff = (this.chain.diff + (block.timestamp.getTime() - latestBlock.timestamp.getTime())) % 63
 
