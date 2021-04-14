@@ -1,24 +1,8 @@
 import Block from './database/models/block'
 import Chain from './database/models/chain'
+import { defaultConfig, BlockchainConfig } from './config'
 
-import { Sequelize, Options as SequelizeOptions } from 'sequelize'
-
-interface BlockchainConfig {
-	database?: {
-		connection?: string
-		options?: SequelizeOptions
-	}
-}
-
-const env = process.env.NODE_ENV || 'development'
-const defaultConfig: BlockchainConfig = {
-	database: {
-		connection: env === 'test' ? 'sqlite::memory' : `mariadb://possum:${process.env.DB_PASSWORD || "possum"}@db/possumcoin`,
-		options: {
-			logging: env !== 'test'
-		}
-	}
-}
+import { Sequelize } from 'sequelize'
 
 const models = {
 	Block,
@@ -70,7 +54,7 @@ export default class Blockchain {
 		})
 
 		block.proofOfWork(this.chain.diff)
-		this.chain.diff += block.timestamp.getTime() - latestBlock.timestamp.getTime()
+		this.chain.diff = (this.chain.diff + (block.timestamp.getTime() - latestBlock.timestamp.getTime())) % 63
 
 		await block.save()
 		return block

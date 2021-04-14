@@ -1,7 +1,7 @@
 {
-  "name": "possumcoin",
+  "name": "mkf",
   "version": "0.1.0",
-  "description": "Possum64 cryptocurrency",
+  "description": "Monkey Flip",
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
@@ -10,21 +10,27 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RossComputerGuy/PossumCoin.git"
+    "url": "git+https://github.com/RossComputerGuy/MKF.git"
   },
   "author": "Tristan Ross",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/RossComputerGuy/PossumCoin/issues"
+    "url": "https://github.com/RossComputerGuy/MKF/issues"
   },
-  "homepage": "https://github.com/RossComputerGuy/PossumCoin#readme",
+  "homepage": "https://github.com/RossComputerGuy/MKF#readme",
   "devDependencies": {
     "@types/crypto-js": "^4.0.1",
     "@types/node": "^14.14.37",
     "@types/sequelize": "^4.28.9",
+    "@types/winston": "^2.4.4",
     "crypto-js": "^4.0.0",
+    "express": "^4.17.1",
+    "jsonschema": "^1.4.0",
+    "mariadb": "^2.5.3",
     "sequelize": "^6.6.2",
     "ts-node-dev": "^1.1.6",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "wait-on": "^5.3.0",
+    "winston": "^3.3.3"
   }
 }

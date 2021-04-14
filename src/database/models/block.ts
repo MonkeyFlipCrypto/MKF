@@ -36,11 +36,12 @@ export default class Block extends Model {
 			},
 			data: {
 				type: DataTypes.STRING,
-				allowNull: false
+				allowNull: true
 			},
 			nonce: {
 				type: DataTypes.BIGINT,
-				allowNull: false
+				allowNull: false,
+				defaultValue: 0
 			},
 			preceedingHash: {
 				type: DataTypes.STRING,
@@ -48,7 +49,8 @@ export default class Block extends Model {
 			},
 			hash: {
 				type: DataTypes.STRING,
-				allowNull: false
+				allowNull: false,
+				defaultValue: ''
 			},
 			ownerID: {
 				type: DataTypes.UUID,

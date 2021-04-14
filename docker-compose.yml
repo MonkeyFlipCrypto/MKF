@@ -6,10 +6,10 @@ services:
     volumes:
       - "db:/var/lib/mysql"
     environment:
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-possum}"
-      MYSQL_DATABASE: possumcoin
-      MYSQL_USER: possum
-      MYSQL_PASSWORD: "${DB_PASSWORD:-possum}"
+      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-monkeyflip}"
+      MYSQL_DATABASE: flip
+      MYSQL_USER: monkey
+      MYSQL_PASSWORD: "${DB_PASSWORD:-monkeyflip}"
       MYSQL_ROOT_HOST: "%"
     networks:
       - servers
@@ -23,7 +23,7 @@ services:
     networks:
       - servers
     environment:
-      DB_PASSWORD: "${DB_PASSWORD:-possum}"
+      DB_PASSWORD: "${DB_PASSWORD:-monkeyflip}"
     volumes:
       - ".:/usr/src"
     restart: on-failure
