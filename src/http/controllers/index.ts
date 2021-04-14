@@ -21,81 +21,93 @@ export default function(bc: Blockchain) {
 
 	return {
 		async register(req: Request, res: Response, next: NextFunction) {
-			const key = crypto.randomBytes(25).toString('hex')
-			const user = await User.create({
-				key
-			})
+			try {
+				const key = crypto.randomBytes(25).toString('hex')
+				const user = await User.create({
+					key
+				})
 
-			res.json(new BaseMessage({
-				key,
-				uuid: user.uuid
-			}, 'user:register'))
+				res.json(new BaseMessage({
+					key,
+					uuid: user.uuid
+				}, 'user:register'))
+			} catch (err) {
+				next(err)
+			}
 		},
 		async unregister(req: Request, res: Response, next: NextFunction) {
-			const user = await User.findOne({
-				where: { uuid: req.body.id }
-			})
+			try {
+				const user = await User.findOne({
+					where: { uuid: req.body.id }
+				})
 
-			if (user === null) {
-				throw new HttpBadRequestError('User does not exist')
-			}
-
-			if (!bcrypt.compareSync(req.body.key, user.key)) {
-				throw new HttpBadRequestError('Invalid key, cannot authenticate')
-			}
-
-			const blocks = await Block.findAll({
-				where: {
-					owner: user.id
+				if (user === null) {
+					throw new HttpBadRequestError('User does not exist')
 				}
-			})
 
-			for (const block of blocks) {
-				block.owner = null
-				await block.save()
+				if (!bcrypt.compareSync(req.body.key, user.key)) {
+					throw new HttpBadRequestError('Invalid key, cannot authenticate')
+				}
+
+				const blocks = await Block.findAll({
+					where: {
+						owner: user.id
+					}
+				})
+
+				for (const block of blocks) {
+					block.owner = null
+					await block.save()
+				}
+
+				await user.destroy()
+
+				res.json(new BaseMessage({
+					endWorth: blocks.length
+				}, 'user:unregister'))
+			} catch (err) {
+				next(err)
 			}
-
-			await user.destroy()
-
-			res.json(new BaseMessage({
-				endWorth: blocks.length
-			}, 'user:unregister'))
 		},
 		async mine(req: Request, res: Response, next: NextFunction) {
-			const user = await User.findOne({
-				where: { uuid: req.body.id }
-			})
+			try {
+				const user = await User.findOne({
+					where: { uuid: req.body.id }
+				})
 
-			if (user === null) {
-				throw new HttpBadRequestError('User does not exist')
-			}
-
-			if (!bcrypt.compareSync(req.body.key, user.key)) {
-				throw new HttpBadRequestError('Invalid key, cannot authenticate')
-			}
-
-			const block = await Block.findOne({
-				where: {
-					hash: req.body.hash,
-					owner: null
+				if (user === null) {
+					throw new HttpBadRequestError('User does not exist')
 				}
-			})
 
-			if (block === null) {
-				throw new HttpBadRequestError('Invalid hash, either it doesn\'t exist or someone already owns it')
+				if (!bcrypt.compareSync(req.body.key, user.key)) {
+					throw new HttpBadRequestError('Invalid key, cannot authenticate')
+				}
+
+				const block = await Block.findOne({
+					where: {
+						hash: req.body.hash,
+						owner: null
+					}
+				})
+
+				if (block === null) {
+					throw new HttpBadRequestError('Invalid hash, either it doesn\'t exist or someone already owns it')
+				}
+
+				block.owner = user.id
+				await block.save()
+
+				setTimeout(() => {
+					bc.addBlock().then(() => winston.info('Generated a new block'))
+						.catch(error => winston.error(`Failed to generate a new block: ${error}`))
+				}, 3000)
+
+				res.json(new BaseMessage({
+					worth: await getWorth(user.id)
+				}, 'user:mine'))
+			} catch (err) {
+				next(err)
 			}
-
-			block.owner = user.id
-			await block.save()
-
-			setTimeout(() => {
-				bc.addBlock().then(() => winston.info('Generated a new block'))
-					.catch(error => winston.error(`Failed to generate a new block: ${error}`))
-			}, 3000)
-
-			res.json(new BaseMessage({
-				worth: await getWorth(user.id)
-			}, 'user:mine'))
 		},
 		async sell(req: Request, res: Response, next: NextFunction) {
 			const user = await User.findOne({
