@@ -182,7 +182,7 @@ export default function(bc: Blockchain) {
 			const totalBlocks = await Block.count()
 			const ownedBlocks = totalBlocks - freeBlocks
 
-			const firstBlock = await Block.findOne({
+			const firstBlock = await Block.findAll({
 				limit: 1,
 				where: {},
 				order: [['createdAt', 'ASC']]
