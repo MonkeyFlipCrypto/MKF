@@ -184,7 +184,7 @@ export default function(bc: Blockchain) {
 			const firstHash = await Block.findAll({
 				limit: 1,
 				where: {},
-				order: [['createdAt'. 'ASC']]
+				order: [['createdAt', 'ASC']]
 			})[0].hash
 
 			res.json(new BaseMessage({
