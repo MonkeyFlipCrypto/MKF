@@ -70,7 +70,7 @@ export default class Blockchain {
 		})
 
 		block.proofOfWork(this.chain.diff)
-		this.chain.diff += (block.timestamp.getTime() - latestBlock.timestamp.getTime()) * count
+		this.chain.diff += block.timestamp.getTime() - latestBlock.timestamp.getTime()
 
 		await block.save()
 		return block
