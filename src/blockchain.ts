@@ -26,7 +26,13 @@ export default class Blockchain {
 		await this.db.authenticate()
 		await this.db.sync({ force: false })
 
-		this.chain = await Chain.findOrCreate({ where: {} })[0]
+		if ((await Chain.count()) == 0) {
+			this.chain = await Chain.create({})
+		} else {
+			this.chain = await Chain.findOne({
+				where: {}
+			})
+		}
 		const count = await Block.count()
 
 		if (count === 0) {

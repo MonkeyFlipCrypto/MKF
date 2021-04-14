@@ -95,7 +95,7 @@ export default function(bc: Blockchain) {
 
 			res.json(new BaseMessage({
 				worth: await getWorth(user.id)
-			}, 'user:sell'))
+			}, 'user:mine'))
 		},
 		async sell(req: Request, res: Response, next: NextFunction) {
 			const user = await User.findOne({
