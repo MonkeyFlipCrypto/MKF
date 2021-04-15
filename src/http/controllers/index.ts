@@ -7,6 +7,7 @@ import { BaseMessage } from '../../message'
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
+import random from 'random'
 
 const genGetWorth = (bc: Blockchain) => async (id: number) => {
 	return await Block.count({
@@ -96,11 +97,15 @@ export default function(bc: Blockchain) {
 
 				block.owner = user.id
 				await block.save()
+				bc.claim(block)
+
+				const date = new Date()
+				const rand = random.int(bc.difficulty, bc.difficulty + Math.pow(bc.difficulty, 2)) % 10000
 
 				setTimeout(() => {
-					bc.addBlock().then(() => winston.info('Generated a new block'))
+					bc.addBlock(date, rand).then(() => winston.info('Generated a new block'))
 						.catch(error => winston.error(`Failed to generate a new block: ${error}`))
-				}, 3000)
+				}, rand)
 
 				res.json(new BaseMessage({
 					worth: await getWorth(user.id)
@@ -212,10 +217,14 @@ export default function(bc: Blockchain) {
 				order: [['createdAt', 'ASC']]
 			})
 
+			const lastClaimedBlock = await bc.getLastUpdatedBlock()
+
 			res.json(new BaseMessage({
 				freeBlocks,
 				totalBlocks,
 				ownedBlocks,
+				difficulty: bc.difficulty,
+				lastClaimedTimestamp: lastClaimedBlock == null ? lastClaimedBlock.timestamp.getDate() : null,
 				firstBlock: {
 					index: firstBlock[0].index,
 					hash: firstBlock[0].hash,

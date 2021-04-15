@@ -31,7 +31,6 @@ export default class Block extends Model {
 			},
 			timestamp: {
 				type: DataTypes.DATE,
-				defaultValue: DataTypes.NOW,
 				allowNull: false
 			},
 			data: {

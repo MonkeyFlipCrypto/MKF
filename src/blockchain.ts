@@ -22,6 +22,21 @@ export default class Blockchain {
 			.forEach(model => model.initializeModel(this.db))
 	}
 
+	claim(block: Block): void {
+		this.chain.lastUpdatedBlockIndex = block.index
+	}
+
+	get difficulty(): number {
+		return this.chain.diff
+	}
+
+	async getLastUpdatedBlock(): Promise<Block> {
+		if (this.chain.lastUpdatedBlockIndex == null) return null
+		return await Block.findOne({
+			where: { index: this.chain.lastUpdatedBlockIndex }
+		})
+	}
+
 	async init(): Promise<void> {
 		await this.db.authenticate()
 		await this.db.sync({ force: false })
@@ -55,13 +70,15 @@ export default class Blockchain {
 		}))[0]
 	}
 
-	async addBlock(): Promise<Block> {
+	async addBlock(preTimestamp: Date, rand: number): Promise<Block> {
 		const latestBlock = await this.obtainLatestBlock()
+		const lastUpdatedBlock = await this.getLastUpdatedBlock()
 		const count = await Block.count()
 
 		const block = await Block.create({
 			data: this.chain.diff.toString(),
-			preceedingHash: latestBlock.hash
+			preceedingHash: latestBlock.hash,
+			timestamp: new Date(preTimestamp.getTime() + rand)
 		})
 
 		block.hash = block.computeHash()
