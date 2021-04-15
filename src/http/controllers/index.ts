@@ -224,7 +224,7 @@ export default function(bc: Blockchain) {
 				totalBlocks,
 				ownedBlocks,
 				difficulty: bc.difficulty,
-				lastClaimedTimestamp: lastClaimedBlock == null ? lastClaimedBlock.timestamp.getDate() : null,
+				lastClaimedTimestamp: lastClaimedBlock != null ? lastClaimedBlock.timestamp.getDate() : firstBlock[0].timestamp.getDate() - 4,
 				firstBlock: {
 					index: firstBlock[0].index,
 					hash: firstBlock[0].hash,
