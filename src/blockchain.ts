@@ -53,6 +53,7 @@ export default class Blockchain {
 		if (count === 0) {
 			// Create our genesis block
 			const block = await Block.create({
+				timestamp: new Date(),
 				data: 'Initial block in chain',
 				preceedingHash: '0'
 			})
