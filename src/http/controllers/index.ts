@@ -110,70 +110,82 @@ export default function(bc: Blockchain) {
 			}
 		},
 		async sell(req: Request, res: Response, next: NextFunction) {
-			const user = await User.findOne({
-				where: { uuid: req.body.id }
-			})
+			try {
+				const user = await User.findOne({
+					where: { uuid: req.body.id }
+				})
 
-			if (user === null) {
-				throw new HttpBadRequestError('User does not exist')
-			}
-
-			if (!bcrypt.compareSync(req.body.key, user.key)) {
-				throw new HttpBadRequestError('Invalid key, cannot authenticate')
-			}
-
-			const block = await Block.findOne({
-				where: {
-					hash: req.body.hash,
-					owner: user.id
+				if (user === null) {
+					throw new HttpBadRequestError('User does not exist')
 				}
-			})
 
-			if (block === null) {
-				throw new HttpBadRequestError('Invalid hash, either it doesn\'t exist or user does not own it')
+				if (!bcrypt.compareSync(req.body.key, user.key)) {
+					throw new HttpBadRequestError('Invalid key, cannot authenticate')
+				}
+
+				const block = await Block.findOne({
+					where: {
+						hash: req.body.hash,
+						owner: user.id
+					}
+				})
+
+				if (block === null) {
+					throw new HttpBadRequestError('Invalid hash, either it doesn\'t exist or user does not own it')
+				}
+
+				block.owner = null
+				await block.save()
+
+				res.json(new BaseMessage({
+					worth: await getWorth(user.id)
+				}, 'user:sell'))
+			} catch (err) {
+				next(err)
 			}
-
-			block.owner = null
-			await block.save()
-
-			res.json(new BaseMessage({
-				worth: await getWorth(user.id)
-			}, 'user:sell'))
 		},
 		async worth(req: Request, res: Response, next: NextFunction) {
-			const user = await User.findOne({
-				where: { uuid: req.query.id }
-			})
+			try {
+				const user = await User.findOne({
+					where: { uuid: req.query.id }
+				})
 
-			if (user === null) {
-				throw new HttpBadRequestError('User does not exist')
+				if (user === null) {
+					throw new HttpBadRequestError('User does not exist')
+				}
+
+				res.json(new BaseMessage({
+					uuid: user.uuid,
+					worth: await getWorth(user.id)
+				}, 'user:worth'))
+			} catch (err) {
+				next(err)
 			}
-
-			res.json(new BaseMessage({
-				uuid: user.uuid,
-				worth: await getWorth(user.id)
-			}, 'user:worth'))
 		},
 		async assets(req: Request, res: Response, next: NextFunction) {
-			const user = await User.findOne({
-				where: { uuid: req.body.id }
-			})
+			try {
+				const user = await User.findOne({
+					where: { uuid: req.body.id }
+				})
 
-			if (user === null) {
-				throw new HttpBadRequestError('User does not exist')
-			}
-
-			if (!bcrypt.compareSync(req.body.key, user.key)) {
-				throw new HttpBadRequestError('Invalid key, cannot authenticate')
-			}
-
-			const blocks = await Block.findAll({
-				where: {
-					owner: user.id
+				if (user === null) {
+					throw new HttpBadRequestError('User does not exist')
 				}
-			})
 
-			res.json(new BaseMessage(blocks.map(block => block.hash), 'user:assets'))
+				if (!bcrypt.compareSync(req.body.key, user.key)) {
+					throw new HttpBadRequestError('Invalid key, cannot authenticate')
+				}
+
+				const blocks = await Block.findAll({
+					where: {
+						owner: user.id
+					}
+				})
+
+				res.json(new BaseMessage(blocks.map(block => block.hash), 'user:assets'))
+			} catch (err) {
+				next(err)
+			}
 		},
 		async list(req: Request, res: Response, next: NextFunction) {
 			const users = await User.findAll({})
