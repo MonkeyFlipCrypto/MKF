@@ -38,7 +38,6 @@ export default class Blockchain {
 		if (count === 0) {
 			// Create our genesis block
 			const block = await Block.create({
-				index: 0,
 				data: 'Initial block in chain',
 				preceedingHash: '0'
 			})
@@ -61,7 +60,6 @@ export default class Blockchain {
 		const count = await Block.count()
 
 		const block = await Block.create({
-			index: count,
 			data: this.chain.diff.toString(),
 			preceedingHash: latestBlock.hash
 		})
