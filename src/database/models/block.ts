@@ -11,7 +11,7 @@ export default class Block extends Model {
 	public owner!: number
 
 	computeHash() {
-		return SHA256(this.index + this.preceedingHash + this.timestamp.getTime() + JSON.stringify(this.data) + this.nonce).toString()
+		return SHA256(this.index + this.preceedingHash + this.timestamp.toLocaleString('en-US', { timezone: 'UTC' }) + JSON.stringify(this.data) + this.nonce).toString()
 	}
 
 	proofOfWork(diff: number) {
