@@ -99,7 +99,12 @@ export default function(bc: Blockchain) {
 				await block.save()
 				bc.claim(block)
 
-				const date = new Date()
+				const lastClaimedBlock = await bc.getLastUpdatedBlock() || (await Block.findAll({
+					limit: 1,
+					where: {},
+					order: [['createdAt', 'ASC']]
+				}))[0]
+				const date = lastClaimedBlock.timestamp
 				const rand = random.int(bc.difficulty, bc.difficulty + Math.pow(bc.difficulty, 2)) % 10000
 
 				setTimeout(() => {
@@ -224,7 +229,7 @@ export default function(bc: Blockchain) {
 				totalBlocks,
 				ownedBlocks,
 				difficulty: bc.difficulty,
-				lastClaimedTimestamp: lastClaimedBlock != null ? lastClaimedBlock.timestamp.getDate() : firstBlock[0].timestamp.getDate() - 4,
+				lastClaimedTimestamp: lastClaimedBlock != null ? lastClaimedBlock.timestamp.getTime() : firstBlock[0].timestamp.getTime() - 4,
 				firstBlock: {
 					index: firstBlock[0].index,
 					hash: firstBlock[0].hash,
